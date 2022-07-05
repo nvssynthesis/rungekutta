@@ -1,0 +1,143 @@
+#N canvas 220 355 1025 673 12;
+#X declare -path /Users/nicholassolem/Local/Pd/externals/rungekutta~mac_only
+;
+#X obj 251 378 env~ 8192, f 4;
+#X floatatom 250 418 5 0 0 0 - - -;
+#X floatatom 497 223 5 0 200 0 - - -;
+#X obj 94 381 env~ 8192, f 5;
+#X floatatom 94 421 5 0 0 0 - - -;
+#X obj 497 245 / 25;
+#X msg 905 268 print;
+#X obj 142 380 output~;
+#X floatatom 354 215 5 0 150 0 - - -;
+#X obj 354 237 mtof;
+#X obj 355 282 pack 0 50;
+#X obj 355 307 line~;
+#X obj 300 380 output~;
+#X floatatom 354 260 7 0 0 0 - - -;
+#X text 844 241 filter state;
+#X floatatom 703 236 5 1 10 0 - - -;
+#X msg 703 263 oversample \$1;
+#X text 489 127 "resonance";
+#X text 488 144 (>4 to oscillate);
+#X text 545 241 scaled to 0-8;
+#X text 544 223 0-200 control;
+#X text 333 125 resonant or cutoff frequency, f 16;
+#X text 320 91 ----- filter parameters ----;
+#X text 650 93 ------ optimizations / setup params -------;
+#X obj 497 172 loadbang;
+#X msg 497 197 10;
+#X obj 496 273 line~;
+#N canvas 743 303 450 300 test 0;
+#X obj 102 122 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X obj 313 127 min~;
+#X obj 357 103 -~ 1;
+#X obj 357 128 *~ -50;
+#X floatatom 102 102 5 0 128 0 - - -;
+#X obj 235 72 mtof;
+#X obj 102 141 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 1
+1;
+#X text 196 32 test signal;
+#X text 147 102 pitch;
+#X text 119 140 sawtooth;
+#X obj 312 70 phasor~ 220;
+#X obj 233 107 osc~ 220;
+#X obj 102 160 tgl 15 0 empty empty empty 17 7 0 10 -262144 -1 -1 0
+1;
+#X text 121 120 sine;
+#X text 120 159 noise;
+#X floatatom 103 181 3 0 100 0 - - -;
+#X obj 62 24 loadbang;
+#X msg 62 49 57;
+#X msg 48 163 80;
+#X text 133 180 dB out;
+#X msg 60 111 1;
+#X obj 362 189 noise~;
+#X obj 204 207 *~ 0;
+#X obj 316 184 *~ 0;
+#X obj 315 217 *~ 0;
+#X obj 208 238 +~;
+#X obj 208 263 outlet~;
+#X connect 0 0 22 1;
+#X connect 1 0 23 0;
+#X connect 2 0 3 0;
+#X connect 3 0 1 1;
+#X connect 4 0 5 0;
+#X connect 5 0 10 0;
+#X connect 5 0 11 0;
+#X connect 6 0 23 1;
+#X connect 10 0 1 0;
+#X connect 10 0 2 0;
+#X connect 11 0 22 0;
+#X connect 12 0 24 1;
+#X connect 16 0 17 0;
+#X connect 16 0 18 0;
+#X connect 16 0 20 0;
+#X connect 17 0 4 0;
+#X connect 18 0 15 0;
+#X connect 20 0 6 0;
+#X connect 21 0 24 0;
+#X connect 22 0 25 0;
+#X connect 23 0 25 1;
+#X connect 24 0 25 1;
+#X connect 25 0 26 0;
+#X coords 0 -1 1 1 95 100 2 100 100;
+#X restore 137 130 pd test;
+#X text 248 441 output monitor;
+#X text 90 442 input monitor;
+#X obj 354 166 loadbang;
+#X msg 354 191 69;
+#X text 104 96 ----- test input ----;
+#X text 376 397 <--- adjust output "dB" to hear filter output.;
+#X msg 841 266 set;
+#X text 86 13 rungekutte~ - Runge-Kutte numerical solution to differential
+equations, f 79;
+#X text 502 494 By default rungekutte~ does one step of 4th-order Runge-Kutte
+integration per audio sample. To improve accuracy and/or to extend
+the range of the filter to higher cutoff frequencies you can oversample
+by any factor - but note that computation time rises accordingly.;
+#X text 510 592 "set" sets the state of the equations - you can give
+it numbers to set the (in this case 4) values or leave them out to
+clear.;
+#X text 840 222 set or print;
+#X text 854 200 utility:;
+#X text 621 386 arguments: shared object name \, oversampling factor
+;
+#X text 696 209 oversampling:;
+#X text 29 602 The second argument \, "2" \, requests that the integration
+use two steps per audio sample., f 44;
+#X text 19 498 In this example the rungekutte~ object loads the shared
+object "moogfilter" \, using the filenames "moogfilter.x86_64_so" \,
+"moogfilter.i386_so" \, "moogfilter.arm_so" \, "moogfilter.mac_so"
+\, "moogfilter.dll" \, depending on operating system and CPU architecure.
+;
+#X obj 463 446 declare -path /Users/nicholassolem/Local/Pd/externals/rungekutta~mac_only
+;
+#X obj 291 337 /Users/nicholassolem/Local/Pd/externals/rungekutta~mac_only/rungekutta~
+moogfilter 2;
+#X connect 0 0 1 0;
+#X connect 2 0 5 0;
+#X connect 3 0 4 0;
+#X connect 5 0 26 0;
+#X connect 6 0 45 0;
+#X connect 8 0 9 0;
+#X connect 9 0 13 0;
+#X connect 10 0 11 0;
+#X connect 11 0 45 1;
+#X connect 13 0 10 0;
+#X connect 15 0 16 0;
+#X connect 16 0 45 0;
+#X connect 24 0 25 0;
+#X connect 25 0 2 0;
+#X connect 26 0 45 2;
+#X connect 27 0 7 0;
+#X connect 27 0 7 1;
+#X connect 27 0 3 0;
+#X connect 27 0 45 0;
+#X connect 30 0 31 0;
+#X connect 31 0 8 0;
+#X connect 34 0 45 0;
+#X connect 45 0 0 0;
+#X connect 45 0 12 0;
+#X connect 45 0 12 1;

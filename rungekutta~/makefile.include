@@ -1,0 +1,88 @@
+current: l_i386 l_ia64
+
+# ----------------------- Windows -----------------------
+MSCC = cl
+MSLN = link
+
+pd_nt: $(NAME).dll
+
+.SUFFIXES: .dll
+
+PDNTCFLAGS = /W3 /WX /DMSW /DPD /nologo -D_CRT_SECURE_NO_WARNINGS \
+    -D_CRT_NONSTDC_NO_DEPRECATE
+VC = "C:\\Program Files\\Microsoft Visual Studio 9.0\\VC"
+VSTK = "C:\\Program Files\\Microsoft SDKs\\Windows\\v6.0A"
+
+PDNTINCLUDE = /I. /I..\\..\\src /I$(VC)\\include /I$(VSTK)\\include
+
+PDNTLDIR = $(VC)\\lib
+PDNTLIB = /NODEFAULTLIB:libcmt /NODEFAULTLIB:oldnames /NODEFAULTLIB:kernel32 \
+        /NODEFAULTLIB:uuid \
+	$(PDNTLDIR)\\libcmt.lib $(PDNTLDIR)\\oldnames.lib \
+        $(VSTK)\\lib\\kernel32.lib $(VSTK)\\lib\\uuid.lib \
+	 ..\\..\\..\\..\\bis\\work\\wine\\drive_c\\users\\msp\\pd\\bin\\pd.lib
+
+.c.dll:
+	$(MSCC) $(PDNTCFLAGS) $(PDNTINCLUDE) /c $*.c
+	$(MSLN) /nologo /dll /export:$(CSYM)_setup $*.obj $(PDNTLIB)
+
+# ----------------------- LINUX i386 and ia64 -----------------------
+
+l_i386: $(NAME).l_i386
+l_ia64: $(NAME).l_ia64
+l_arm: $(NAME).l_arm
+
+.SUFFIXES: .l_i386 .l_ia64 .l_arm
+
+LINUXCFLAGS = -DPD -O2 -funroll-loops -fomit-frame-pointer \
+    -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-unused-parameter -Wno-parentheses -Wno-switch $(CFLAGS)
+
+UNIXINCLUDE =  -I../pd/src -I../../pd/src -I../../../pd/src \
+    -I../../../../pd/src -I../../../../../pd/src\
+    -I/Applications/Pd-0.52-1-really.app/Contents/Resources/src
+LINUXINCLUDE =  $(UNIXINCLUDE)
+
+.c.l_i386:
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) -m32 -o $*.o -c $*.c
+	$(CC) -m32 -shared -o $*.l_i386 $*.o -lc -lm 
+	strip --strip-unneeded $*.l_i386
+	rm -f $*.o
+
+.c.l_ia64:
+	cc $(LINUXCFLAGS) $(LINUXINCLUDE) -fPIC -o $*.o -c $*.c
+	ld  -shared -o $*.l_ia64 $*.o -lc -lm 
+	strip --strip-unneeded $*.l_ia64
+	rm $*.o
+
+.c.l_arm:
+	$(CC) $(LINUXCFLAGS) $(LINUXINCLUDE) --fast-math -o $*.o -c $*.c
+	$(CC) --fast-math -shared -o $*.l_arm $*.o -lc -lm 
+	strip --strip-unneeded $*.l_arm
+	rm -f $*.o
+
+# ----------------------- Mac OSX -----------------------
+
+d_ppc: $(NAME).d_ppc
+d_fat: $(NAME).d_fat
+
+.SUFFIXES: .d_ppc .d_fat
+
+DARWINCFLAGS = -DPD -O2 -Wall -W -Wshadow -Wstrict-prototypes \
+    -Wno-unused -Wno-parentheses -Wno-switch
+
+.c.d_ppc:
+	$(CC) $(DARWINCFLAGS) $(UNIXINCLUDE) -o $*.o -c $*.c
+	$(CC) -bundle -undefined suppress -flat_namespace -o $*.pd_darwin $*.o 
+	rm -f $*.o
+
+.c.d_fat:
+	$(CC) -arch x86_64 $(DARWINCFLAGS) $(UNIXINCLUDE) -o $*.o -c $*.c
+	$(CC) -arch x86_64 -bundle -undefined suppress -flat_namespace \
+	    -o $*.d_fat $*.o 
+	rm -f $*.o
+
+# ----------------------------------------------------------
+
+clean:
+	rm -f *.o *.pd_* *.d_ppc *.d_fat *.l_i386 *.l_ia64 *.dll
