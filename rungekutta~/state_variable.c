@@ -25,8 +25,8 @@ static float clip(float value, float saturation)
 static float invert_clamp(float value)
 {
     // avoid divide by zero and limit output value, which in turn limits bandwidth
-    if (value < 0.9f)
-        value = 0.9f;
+    if (value < 0.707f)
+        value = 0.707f;
     return 1.f / value;
 }
 
